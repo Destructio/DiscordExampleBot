@@ -16,10 +16,8 @@ import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.voice.AudioProvider;
 import org.apache.log4j.Logger;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ExampleBot {
 
@@ -107,9 +105,40 @@ public class ExampleBot {
         });
 
         commands.put("stop", event -> {
-            player.stopTrack();
-            LOG.info("Stopped!");
+                player.stopTrack();
         });
 
+
+        commands.put("roll", event -> {
+            final String content = event.getMessage().getContent();
+            final List<String> command = Arrays.asList(content.split(" "));
+            String out;
+            int wordCount = command.size();
+            switch (wordCount)
+            {
+                case 1:
+                    {
+                        int random = ThreadLocalRandom.current().nextInt(); //TODO Recode this cause numbers are too strange?
+                        LOG.info("Random number is RandomThread int - " + random);
+                        out = String.valueOf(random);
+                        break;
+                    }
+                case 2:
+                    {
+                        int random = new Random().nextInt((Integer.parseInt(command.get(1))) + 1);
+                        LOG.info("Random number in range " + command.get(1) + " is - " + random);
+                        out = String.valueOf(random);
+                        break;
+                    }
+                default:
+                    out = "Please enter correct range! e.g !roll 100";
+            }
+
+            event.getMessage().getChannel()
+                    .block()
+                    .createMessage(out)
+                    .block();
+        });
     }
+
 }
